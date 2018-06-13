@@ -1,31 +1,30 @@
 def decodeString(s):
-    count_stack = []
+    from re import findall
+
     string_stack = []
-    temp = ''
+    count_stack = []
     result = ''
+    temp = ''
+    prev_elem = ''
 
-    for i in range(len(s)):
-        count = 0
-        if s[i].isdigit():
-            while s[i].isdigit():
-                count = count * 10 + ord(s[i]) - ord('0')
-                i += 1
+    
+    # extract all digits from the string
+    count_stack = list(map(int, findall(r'\d+',s)))
 
-            i -= 1
-            count_stack.append(count)
+    for char in s:
+        if char.isdigit():
+            prev_elem = char
 
-        elif s[i] == ']':
+        elif char == ']':
             temp = ''
             count = 0
 
             if len(count_stack) > 0:
-                    count = count_stack[-1]
-                    count_stack.pop()
-
+                count = count_stack[-1]
+                count_stack.pop()
             while len(string_stack) > 0 and string_stack[-1] != '[':
-                    temp = string_stack[-1] + temp
-                    string_stack.pop()
-
+                temp = string_stack[-1] + temp
+                string_stack.pop()
             if len(string_stack) > 0 and string_stack[-1] == '[':
                 string_stack.pop()
 
@@ -34,24 +33,23 @@ def decodeString(s):
             for char in result:
                 string_stack.append(char)
 
-        elif s[i] == '[':
-            if s[i-1].isdigit():
-                string_stack.append(s[i])
-
+        elif char == '[':
+            if prev_elem.isdigit():
+                string_stack.append(char)
             else:
-                string_stack.append(s[i])
+                string_stack.append(char)
                 count_stack.append(1)
 
         else:
-            string_stack.append(s[i])
+            string_stack.append(char)
+            prev_elem = char
 
     while len(string_stack) > 0:
-        result = string_stack.pop() + result;
+        result = string_stack.pop() + result
         string_stack.pop()
 
-    print (result)
+    return result
 
-decodeString('2[ab]')
-decodeString('2[b3[a]]')
-
+print(decodeString('2[ab]'))
+print(decodeString('2[b3[a]]'))
 
